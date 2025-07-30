@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SAM Pharmacy - Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Cairo', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #e9e9ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .logo h1 {
+      color: #002a7f;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #222;
+    }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      background: #002a7f;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-top: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #001c5c;
+    }
+    .signup {
+      margin-top: 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .signup a {
+      color: #002a7f;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .message {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>SAM</h1>
+    </div>
+    <h2>Login to your Account</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Sign In</button>
+    <div class="signup">
+      Don't have an account? <a href="#">Sign up</a>
+    </div>
+    <div class="message" id="message"></div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAdIxUhzpPVStGe_TcYuvcvB92prpVc3Ek",
+      authDomain: "pharmacy-app-5e2a5.firebaseapp.com",
+      projectId: "pharmacy-app-5e2a5",
+      storageBucket: "pharmacy-app-5e2a5.firebasestorage.app",
+      messagingSenderId: "133467785388",
+      appId: "1:133467785388:web:fea35872581791f974b709",
+      measurementId: "G-C1KTS3F4KP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.login = function () {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const messageEl = document.getElementById('message');
+
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          messageEl.style.color = 'green';
+          messageEl.innerText = 'Login successful! Redirecting...';
+          setTimeout(() => {
+            window.location.href = 'dashboard.html'; // غيّرها لو عندك اسم تاني للصفحة
+          }, 1500);
+        })
+        .catch((error) => {
+          messageEl.style.color = 'red';
+          messageEl.innerText = 'Error: ' + error.message;
+        });
+    }
+  </script>
+</body>
+</html>
