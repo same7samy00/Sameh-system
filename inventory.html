@@ -1,208 +1,545 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إدارة المخزون - SAM Pharmacy</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
-  <style>
-    body {
-      font-family: 'Cairo', sans-serif;
-    }
-    dialog::backdrop {
-      background: rgba(0, 0, 0, 0.4);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المخزون - SAM Pharmacy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.4);
+        }
+        /* Style for dark mode if implemented */
+        .dark-mode { background: #1a202c; color: #e2e8f0; }
+        .dark-mode .bg-gray-100 { background: #2d3748 !important; }
+        .dark-mode .bg-white { background: #4a5568 !important; }
+        .dark-mode .text-blue-900 { color: #90cdf4 !important; }
+        .dark-mode .text-gray-600 { color: #a0aec0 !important; }
+        .dark-mode .text-gray-500 { color: #cbd5e0 !important; }
+        .dark-mode .border { border-color: #616e7f !important; }
+        .dark-mode input, .dark-mode select, .dark-mode textarea {
+            background-color: #2d3748 !important;
+            color: #e2e8f0 !important;
+            border-color: #616e7f !important;
+        }
+        .dark-mode input::placeholder, .dark-mode textarea::placeholder {
+            color: #a0aec0 !important;
+        }
+        /* Add more specific dark mode styles if needed for buttons, hover states, etc. */
+        .dark-mode .bg-blue-700 { background-color: #4299e1 !important; }
+        .dark-mode .bg-blue-700:hover { background-color: #3182ce !important; }
+        .dark-mode .bg-green-600 { background-color: #48bb78 !important; }
+        .dark-mode .bg-green-600:hover { background-color: #38a169 !important; }
+        .dark-mode .bg-purple-600 { background-color: #9f7aea !important; }
+        .dark-mode .bg-purple-600:hover { background-color: #805ad5 !important; }
+        .dark-mode .bg-gray-200 { background-color: #718096 !important; }
+        .dark-mode .bg-gray-200:hover { background-color: #a0aec0 !important; }
+
+        .dark-mode .bg-blue-50 { background-color: #2a4365 !important; }
+        .dark-mode .text-blue-800 { color: #90cdf4 !important; }
+        .dark-mode .divide-gray-200 > :not([hidden]) ~ :not([hidden]) { border-color: #4a5568 !important; }
+        .dark-mode .text-gray-900 { color: #e2e8f0 !important; }
+        .dark-mode .text-red-600 { color: #fc8181 !important; }
+        .dark-mode .text-yellow-600 { color: #fbd38d !important; }
+        .dark-mode .text-orange-600 { color: #f6ad55 !important; }
+        .dark-mode .text-green-800 { color: #68d391 !important; }
+        .dark-mode .text-red-800 { color: #feb2b2 !important; }
+        .dark-mode .text-yellow-800 { color: #fcd34d !important; }
+        .dark-mode .bg-green-100 { background-color: #2f855a !important; }
+        .dark-mode .bg-yellow-100 { background-color: #b7791f !important; }
+        .dark-mode .bg-red-100 { background-color: #c53030 !important; }
+        .dark-mode .bg-orange-100 { background-color: #dd6b20 !important; }
+        .dark-mode .bg-gray-100 { background-color: #4a5568 !important; } /* for the nav bar buttons */
+    </style>
 </head>
-<body class="bg-gray-100 pb-24">
-  <div class="max-w-7xl mx-auto px-4 pt-6">
-    <h1 class="text-2xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-      <i class="ri-archive-2-line"></i>
-      إدارة المخزون
-    </h1>
+<body class="bg-gray-100 pb-24" id="mainBody">
+    <div class="max-w-7xl mx-auto px-4 pt-6">
+        <h1 class="text-2xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+            <i class="ri-archive-2-line"></i> إدارة المخزون
+        </h1>
 
-        <div class="flex flex-wrap gap-3 mb-4">
-      <button onclick="document.getElementById('addProductModal').showModal()" class="bg-blue-700 text-white px-4 py-2 rounded-xl flex items-center gap-2">
-        <i class="ri-add-circle-line"></i>
-        إضافة منتج جديد
-      </button>
-    </div>
+        <div class="bg-white rounded-xl shadow p-4 mb-4">
+            <div class="flex flex-wrap gap-3 mb-4 items-center">
+                <button onclick="openAddProductModal()" class="bg-blue-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-blue-800 transition-colors">
+                    <i class="ri-add-circle-line"></i> إضافة منتج جديد
+                </button>
+                <button onclick="importProducts()" class="bg-green-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-green-700 transition-colors">
+                    <i class="ri-file-excel-line"></i> استيراد Excel/CSV
+                </button>
+                <button onclick="printBarcodes()" class="bg-purple-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-purple-700 transition-colors">
+                    <i class="ri-barcode-line"></i> طباعة باركود
+                </button>
+                <button onclick="toggleDarkMode()" class="ml-auto p-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors">
+                    <svg id="darkModeIcon" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <input type="text" id="productSearch" onkeyup="filterProducts()" placeholder="البحث بالاسم، الكود، أو الباركود..." 
+                       class="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select id="categoryFilter" onchange="filterProducts()" class="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">جميع الفئات</option>
+                    <option value="مسكنات">مسكنات</option>
+                    <option value="مضادات حيوية">مضادات حيوية</option>
+                    <option value="فيتامينات">فيتامينات</option>
+                    <option value="ضغط وسكري">أدوية الضغط والسكري</option>
+                    </select>
+                <select id="statusFilter" onchange="filterProducts()" class="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">جميع الحالات</option>
+                    <option value="متوفر">متوفر</option>
+                    <option value="مخزون منخفض">مخزون منخفض</option>
+                    <option value="قريب الانتهاء">قريب الانتهاء</option>
+                    <option value="منتهي الصلاحية">منتهي الصلاحية</option>
+                    <option value="نفد المخزون">نفد المخزون</option>
+                </select>
+                <select id="supplierFilter" onchange="filterProducts()" class="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">جميع الموردين</option>
+                    </select>
+            </div>
+        </div>
 
-        <div class="bg-white rounded-xl shadow overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-blue-50 text-blue-800">
-          <tr>
-            <th class="px-4 py-2 text-right">اسم المنتج</th>
-            <th class="px-4 py-2 text-right">الباركود</th>
-            <th class="px-4 py-2 text-right">الكمية</th>
-            <th class="px-4 py-2 text-right">الوحدة</th>
-            <th class="px-4 py-2 text-right">السعر</th>
-            <th class="px-4 py-2 text-right">تاريخ الانتهاء</th>
-            <th class="px-4 py-2 text-right">المورد</th>
-            <th class="px-4 py-2 text-right">إجراءات</th>
-          </tr>
-        </thead>
-        <tbody id="products-table" class="bg-white divide-y divide-gray-100"></tbody>
-      </table>
-    </div>
-  </div>
+        <div class="bg-white rounded-xl shadow overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-blue-50 text-blue-800">
+                    <tr>
+                        <th class="px-4 py-2 text-right text-sm">الصورة</th>
+                        <th class="px-4 py-2 text-right text-sm">اسم المنتج</th>
+                        <th class="px-4 py-2 text-right text-sm">الباركود</th>
+                        <th class="px-4 py-2 text-right text-sm">الكمية</th>
+                        <th class="px-4 py-2 text-right text-sm">الوحدة</th>
+                        <th class="px-4 py-2 text-right text-sm">السعر</th>
+                        <th class="px-4 py-2 text-right text-sm">تاريخ الانتهاء</th>
+                        <th class="px-4 py-2 text-right text-sm">المورد</th>
+                        <th class="px-4 py-2 text-right text-sm">الحالة</th>
+                        <th class="px-4 py-2 text-right text-sm">إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="products-table" class="bg-white divide-y divide-gray-100">
+                    <tr><td colspan="10" class="text-center py-4 text-gray-500">جاري تحميل المنتجات...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md flex justify-around py-2">
-    <a href="dashboard.html" class="flex flex-col items-center text-sm text-gray-600"><i class="ri-home-line text-lg"></i>الرئيسية</a>
-    <a href="#" class="flex flex-col items-center text-sm text-blue-700 font-semibold"><i class="ri-archive-2-line text-lg"></i>المخزون</a>
-    <a href="sales.html" class="flex flex-col items-center text-sm text-gray-600"><i class="ri-shopping-cart-line text-lg"></i>نقطة البيع</a>
-    <a href="clients.html" class="flex flex-col items-center text-sm text-gray-600"><i class="ri-user-line text-lg"></i>العملاء</a>
-    <a href="settings.html" class="flex flex-col items-center text-sm text-gray-600"><i class="ri-settings-3-line text-lg"></i>الإعدادات</a>
-  </nav>
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-md flex justify-around py-2 z-10">
+        <a href="index.html" class="flex flex-col items-center text-sm text-gray-600 hover:text-blue-700 transition-colors">
+            <i class="ri-home-line text-lg"></i> الرئيسية
+        </a>
+        <a href="#" class="flex flex-col items-center text-sm text-blue-700 font-semibold">
+            <i class="ri-archive-2-line text-lg"></i> المخزون
+        </a>
+        <a href="sales.html" class="flex flex-col items-center text-sm text-gray-600 hover:text-blue-700 transition-colors">
+            <i class="ri-shopping-cart-line text-lg"></i> نقطة البيع
+        </a>
+        <a href="clients.html" class="flex flex-col items-center text-sm text-gray-600 hover:text-blue-700 transition-colors">
+            <i class="ri-user-line text-lg"></i> العملاء
+        </a>
+        <a href="settings.html" class="flex flex-col items-center text-sm text-gray-600 hover:text-blue-700 transition-colors">
+            <i class="ri-settings-3-line text-lg"></i> الإعدادات
+        </a>
+    </nav>
 
-    <dialog id="addProductModal" class="rounded-xl p-0 w-full max-w-xl">
-    <form method="dialog" class="p-6 bg-white rounded-xl">
-      <h2 class="text-lg font-bold text-blue-900 mb-4">إضافة منتج جديد</h2>
-      <div class="grid grid-cols-1 gap-4">
-        <input id="tradeName" placeholder="اسم المنتج" class="border p-2 rounded" required />
-        <input id="barcode" placeholder="الباركود" class="border p-2 rounded" />
-        <input id="quantity" type="number" placeholder="الكمية" class="border p-2 rounded" />
-        <input id="unit" placeholder="الوحدة (مثال: علبة)" class="border p-2 rounded" />
-        <input id="price" type="number" step="0.01" placeholder="السعر" class="border p-2 rounded" />         <input id="expiry" type="date" class="border p-2 rounded" />
-        <input id="supplier" placeholder="اسم المورد" class="border p-2 rounded" />
-      </div>
-      <div class="flex justify-end gap-2 mt-6">
-        <button type="button" onclick="document.getElementById('addProductModal').close()" class="px-4 py-2 bg-gray-200 rounded">إلغاء</button>
-        <button type="button" onclick="addProduct()" class="px-4 py-2 bg-blue-700 text-white rounded">حفظ</button>
-      </div>
-    </form>
-  </dialog>
+    <dialog id="addProductModal" class="rounded-xl p-0 w-full max-w-xl shadow-lg">
+        <form id="productForm" class="p-6 bg-white rounded-xl" method="dialog">
+            <h2 id="modalTitle" class="text-lg font-bold text-blue-900 mb-4">إضافة منتج جديد</h2>
+            <div class="grid grid-cols-1 gap-4 mb-4">
+                <input type="hidden" id="productId" value=""> <input id="tradeName" placeholder="اسم المنتج" class="border p-2 rounded-lg" required />
+                <input id="barcode" placeholder="الباركود" class="border p-2 rounded-lg" />
+                <input id="quantity" type="number" placeholder="الكمية" class="border p-2 rounded-lg" required min="0" />
+                <input id="unit" placeholder="الوحدة (مثال: علبة)" class="border p-2 rounded-lg" />
+                <input id="price" type="number" step="0.01" placeholder="السعر" class="border p-2 rounded-lg" required min="0" />
+                <input id="expiry" type="date" class="border p-2 rounded-lg" />
+                <input id="supplier" placeholder="اسم المورد" class="border p-2 rounded-lg" />
+                <input id="activeIngredient" placeholder="المادة الفعالة (اختياري)" class="border p-2 rounded-lg" />
+                <select id="category" class="border p-2 rounded-lg">
+                    <option value="">اختر الفئة (اختياري)</option>
+                    <option value="مسكنات">مسكنات</option>
+                    <option value="مضادات حيوية">مضادات حيوية</option>
+                    <option value="فيتامينات">فيتامينات</option>
+                    <option value="ضغط وسكري">أدوية الضغط والسكري</option>
+                </select>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button type="button" onclick="document.getElementById('addProductModal').close()" class="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors">إلغاء</button>
+                <button type="submit" class="px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors">حفظ</button>
+            </div>
+        </form>
+    </dialog>
 
-  <script type="module">
-    // Firebase SDKs and config
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
-    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
+    <script type="module">
+        // Firebase SDKs and config
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js';
+        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc, query, where } from 'https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js';
 
-    // Firebase configuration - Using the one provided in your last request
-    const firebaseConfig = {
-      apiKey: "AIzaSyAdIxUhzpPVStGe_TcYuvcvB92prpVc3Ek",
-      authDomain: "pharmacy-app-5e2a5.firebaseapp.com",
-      projectId: "pharmacy-app-5e2a5",
-      storageBucket: "pharmacy-app-5e2a5.firebasestorage.app",
-      messagingSenderId: "133467785388",
-      appId: "1:133467785388:web:fea35872581791f974b709",
-      measurementId: "G-C1KTS3F4KP"
-    };
+        // Firebase configuration - Using the one provided in your last request
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdIxUhzpPVStGe_TcYuvcvB92prpVc3Ek",
+            authDomain: "pharmacy-app-5e2a5.firebaseapp.com",
+            projectId: "pharmacy-app-5e2a5",
+            storageBucket: "pharmacy-app-5e2a5.firebasestorage.app",
+            messagingSenderId: "133467785388",
+            appId: "1:133467785388:web:fea35872581791f974b709",
+            measurementId: "G-C1KTS3F4KP"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const productsCollection = collection(db, 'products');
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const productsCollection = collection(db, 'products');
+        const suppliersCollection = collection(db, 'suppliers'); // Assuming you have a suppliers collection
 
-    /**
-     * Displays a notification message.
-     * @param {string} message The message to display.
-     * @param {'success'|'error'|'info'} type The type of notification.
-     */
-    function showNotification(message, type = 'info') {
-      // For simplicity, using a basic alert. In a real app, integrate with your existing notification system.
-      alert(`${type.toUpperCase()}: ${message}`);
-    }
+        let allProducts = []; // To store all products for filtering
+        let isDarkMode = localStorage.getItem('darkMode') === 'true'; // Load dark mode preference
 
-    /**
-     * Loads products from Firestore and populates the table.
-     */
-    async function loadProducts() {
-      const tableBody = document.getElementById('products-table');
-      tableBody.innerHTML = ''; // Clear existing rows
+        /**
+         * Displays a notification message.
+         * @param {string} message The message to display.
+         * @param {'success'|'error'|'info'|'warning'} type The type of notification.
+         */
+        function showNotification(message, type = 'info') {
+            // For a more advanced notification, you'd integrate with a dedicated notification UI.
+            // For now, using a simple alert.
+            console.log(`${type.toUpperCase()}: ${message}`);
+            alert(`${type.toUpperCase()}: ${message}`); 
+        }
 
-      try {
-        const snapshot = await getDocs(productsCollection);
-        if (snapshot.empty) {
-          tableBody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-gray-500">لا توجد منتجات حاليًا في المخزون.</td></tr>`;
-          return;
-        }
+        /**
+         * Toggles dark mode.
+         */
+        window.toggleDarkMode = function() {
+            isDarkMode = !isDarkMode;
+            document.getElementById('mainBody').classList.toggle('dark-mode', isDarkMode);
+            localStorage.setItem('darkMode', isDarkMode);
+            const darkModeIcon = document.getElementById('darkModeIcon');
+            if (darkModeIcon) {
+                if (isDarkMode) {
+                    darkModeIcon.innerHTML = `<path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707-.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>`;
+                } else {
+                    darkModeIcon.innerHTML = `<path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>`;
+                }
+            }
+        };
 
-        snapshot.forEach(docProduct => {
-          const product = docProduct.data();
-          const productId = docProduct.id; // Get the document ID for actions
 
-          const row = document.createElement('tr');
-          row.className = 'hover:bg-gray-50'; // Tailwind class for hover effect
-          row.innerHTML = `
-            <td class="px-4 py-2">${product.tradeName || '---'}</td>
-            <td class="px-4 py-2">${product.barcode || '---'}</td>
-            <td class="px-4 py-2">${product.quantity || 0}</td>
-            <td class="px-4 py-2">${product.unit || 'علبة'}</td>
-            <td class="px-4 py-2">${(product.price || 0).toFixed(2)} ج.م</td>
-            <td class="px-4 py-2">${product.expiry || '--'}</td>
-            <td class="px-4 py-2">${product.supplier || '--'}</td>
-            <td class="px-4 py-2 space-x-1 rtl:space-x-reverse">
-              <button onclick="deleteProduct('${productId}')" class="text-sm text-red-600 hover:underline">حذف</button>
-            </td>
-          </tr>
-        `;
-          tableBody.appendChild(row);
-        });
-      } catch (error) {
-        showNotification('خطأ في تحميل المنتجات: ' + error.message, 'error');
-        console.error("Error loading products:", error);
-      }
-    }
+        /**
+         * Loads products from Firestore and populates the table.
+         * Also updates the global allProducts array for filtering.
+         */
+        async function loadProducts() {
+            const tableBody = document.getElementById('products-table');
+            tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-gray-500">جاري تحميل المنتجات...</td></tr>`;
 
-    /**
-     * Adds a new product to Firestore.
-     */
-    window.addProduct = async function () {
-      const tradeName = document.getElementById('tradeName').value;
-      const barcode = document.getElementById('barcode').value;
-      const quantity = parseInt(document.getElementById('quantity').value || 0);
-      const unit = document.getElementById('unit').value || 'علبة';
-      const price = parseFloat(document.getElementById('price').value || 0);
-      const expiry = document.getElementById('expiry').value; // Date string
-      const supplier = document.getElementById('supplier').value;
+            try {
+                const snapshot = await getDocs(productsCollection);
+                allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                filterProducts(); // Call filter to display initially
+            } catch (error) {
+                showNotification('خطأ في تحميل المنتجات: ' + error.message, 'error');
+                console.error("Error loading products:", error);
+                tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-red-500">فشل تحميل المنتجات. يرجى المحاولة مرة أخرى.</td></tr>`;
+            }
+        }
 
-      if (!tradeName || quantity <= 0 || price <= 0) {
-        showNotification('الرجاء إدخال اسم المنتج، الكمية، والسعر بشكل صحيح.', 'error');
-        return;
-      }
+        /**
+         * Filters and displays products based on search and filter criteria.
+         */
+        window.filterProducts = function() { // Make it global for onchange/onkeyup
+            const searchTerm = document.getElementById('productSearch').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const supplierFilter = document.getElementById('supplierFilter').value;
+            const tableBody = document.getElementById('products-table');
+            tableBody.innerHTML = '';
 
-      try {
-        await addDoc(productsCollection, {
-          tradeName,
-          barcode: barcode || null, // Allow null if empty
-          quantity,
-          unit,
-          price,
-          expiry: expiry || null, // Allow null if empty
-          supplier: supplier || null, // Allow null if empty
-          createdAt: new Date() // Store as Firestore Timestamp
-        });
-        document.getElementById('addProductModal').close();
-        document.getElementById('addProductModal').querySelector('form').reset(); // Clear form fields
-        showNotification('تم إضافة المنتج بنجاح!', 'success');
-        loadProducts(); // Reload products to update the table
-      } catch (error) {
-        showNotification('حدث خطأ أثناء الإضافة: ' + error.message, 'error');
-        console.error("Error adding product:", error);
-      }
-    }
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time for accurate date comparison
+            const thirtyDaysFromNow = new Date();
+            thirtyDaysFromNow.setDate(today.getDate() + 30);
 
-    /**
-     * Deletes a product from Firestore.
-     * @param {string} productId The ID of the product document to delete.
-     */
-    window.deleteProduct = async function (productId) {
-      if (confirm('هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.')) {
-        try {
-          await deleteDoc(doc(db, 'products', productId));
-          showNotification('تم حذف المنتج بنجاح!', 'success');
-          loadProducts(); // Reload products to update the table
-        } catch (error) {
-          showNotification('حدث خطأ أثناء الحذف: ' + error.message, 'error');
-          console.error("Error deleting product:", error);
-        }
-      }
-    }
+            const filteredProducts = allProducts.filter(product => {
+                const matchesSearch = searchTerm === '' ||
+                                      (product.tradeName && product.tradeName.toLowerCase().includes(searchTerm)) ||
+                                      (product.barcode && product.barcode.toLowerCase().includes(searchTerm)) ||
+                                      (product.activeIngredient && product.activeIngredient.toLowerCase().includes(searchTerm));
 
-    // Initial load of products when the page loads
-    document.addEventListener('DOMContentLoaded', loadProducts);
-  </script>
+                const matchesCategory = categoryFilter === '' ||
+                                        (product.category && product.category === categoryFilter);
+
+                const matchesSupplier = supplierFilter === '' ||
+                                        (product.supplier && product.supplier === supplierFilter);
+
+                let matchesStatus = true;
+                if (statusFilter !== '') {
+                    if (statusFilter === 'متوفر') {
+                        matchesStatus = product.quantity > 50; // Example threshold
+                    } else if (statusFilter === 'مخزون منخفض') {
+                        matchesStatus = product.quantity <= 50 && product.quantity > 0;
+                    } else if (statusFilter === 'قريب الانتهاء') {
+                        if (product.expiry) {
+                            const expiryDate = new Date(product.expiry);
+                            matchesStatus = expiryDate > today && expiryDate <= thirtyDaysFromNow;
+                        } else {
+                            matchesStatus = false;
+                        }
+                    } else if (statusFilter === 'منتهي الصلاحية') {
+                        if (product.expiry) {
+                            const expiryDate = new Date(product.expiry);
+                            matchesStatus = expiryDate < today;
+                        } else {
+                            matchesStatus = false;
+                        }
+                    } else if (statusFilter === 'نفد المخزون') {
+                        matchesStatus = product.quantity === 0;
+                    }
+                }
+
+                return matchesSearch && matchesCategory && matchesSupplier && matchesStatus;
+            });
+
+            if (filteredProducts.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-gray-500">لا توجد منتجات مطابقة لعملية البحث.</td></tr>`;
+                return;
+            }
+
+            filteredProducts.forEach(product => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+
+                let statusText = 'متوفر';
+                let statusClass = 'bg-green-100 text-green-800';
+
+                if (product.quantity === 0) {
+                    statusText = 'نفد المخزون';
+                    statusClass = 'bg-gray-100 text-gray-800';
+                } else if (product.quantity <= 50) { // Example low stock threshold
+                    statusText = 'مخزون منخفض';
+                    statusClass = 'bg-yellow-100 text-yellow-800';
+                }
+                
+                if (product.expiry) {
+                    const expiryDate = new Date(product.expiry);
+                    if (expiryDate < today) {
+                        statusText = 'منتهي الصلاحية';
+                        statusClass = 'bg-red-100 text-red-800';
+                    } else if (expiryDate > today && expiryDate <= thirtyDaysFromNow) {
+                        statusText = 'قريب الانتهاء';
+                        statusClass = 'bg-orange-100 text-orange-800';
+                    }
+                }
+
+                row.innerHTML = `
+                    <td class="px-4 py-2">
+                        <div class="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500">
+                            <i class="ri-image-line text-lg"></i>
+                        </div>
+                    </td>
+                    <td class="px-4 py-2">
+                        <div class="font-semibold text-gray-900">${product.tradeName || '---'}</div>
+                        <div class="text-xs text-gray-500">${product.activeIngredient || ''}</div>
+                    </td>
+                    <td class="px-4 py-2 text-sm">${product.barcode || '---'}</td>
+                    <td class="px-4 py-2 text-sm">${product.quantity || 0}</td>
+                    <td class="px-4 py-2 text-sm">${product.unit || 'علبة'}</td>
+                    <td class="px-4 py-2 text-sm">${(product.price || 0).toFixed(2)} ج.م</td>
+                    <td class="px-4 py-2 text-sm">${product.expiry || '--'}</td>
+                    <td class="px-4 py-2 text-sm">${product.supplier || '--'}</td>
+                    <td class="px-4 py-2">
+                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </td>
+                    <td class="px-4 py-2 space-x-1 rtl:space-x-reverse">
+                        <button onclick="editProduct('${product.id}')" class="text-sm text-blue-600 hover:underline">تعديل</button>
+                        <button onclick="deleteProduct('${product.id}')" class="text-sm text-red-600 hover:underline">حذف</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        /**
+         * Loads suppliers for the filter dropdown.
+         */
+        async function loadSuppliersForFilter() {
+            const supplierFilterSelect = document.getElementById('supplierFilter');
+            // Keep default "جميع الموردين" option
+            const defaultOption = supplierFilterSelect.querySelector('option[value=""]');
+            supplierFilterSelect.innerHTML = '';
+            supplierFilterSelect.appendChild(defaultOption || new Option('جميع الموردين', ''));
+
+            try {
+                const snapshot = await getDocs(suppliersCollection);
+                snapshot.forEach(doc => {
+                    const supplier = doc.data();
+                    const option = document.createElement('option');
+                    option.value = supplier.name; // Assuming supplier name is unique
+                    option.textContent = supplier.name;
+                    supplierFilterSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error loading suppliers for filter:", error);
+            }
+        }
+
+        /**
+         * Opens the add/edit product modal, populating it if editing.
+         * @param {string} [productId] The ID of the product to edit, if any.
+         */
+        window.openAddProductModal = async function (productId = null) {
+            const modal = document.getElementById('addProductModal');
+            const form = document.getElementById('productForm');
+            const modalTitle = document.getElementById('modalTitle');
+            const hiddenProductId = document.getElementById('productId');
+
+            form.reset(); // Clear form fields
+            hiddenProductId.value = ''; // Clear hidden ID
+
+            if (productId) {
+                modalTitle.textContent = 'تعديل منتج';
+                try {
+                    const productDoc = await getDoc(doc(productsCollection, productId));
+                    if (productDoc.exists()) {
+                        const product = productDoc.data();
+                        hiddenProductId.value = productId;
+                        document.getElementById('tradeName').value = product.tradeName || '';
+                        document.getElementById('barcode').value = product.barcode || '';
+                        document.getElementById('quantity').value = product.quantity || 0;
+                        document.getElementById('unit').value = product.unit || '';
+                        document.getElementById('price').value = product.price || 0;
+                        document.getElementById('expiry').value = product.expiry || '';
+                        document.getElementById('supplier').value = product.supplier || '';
+                        document.getElementById('activeIngredient').value = product.activeIngredient || '';
+                        document.getElementById('category').value = product.category || '';
+                    } else {
+                        showNotification('المنتج المطلوب للتعديل غير موجود.', 'error');
+                        modal.close();
+                        return;
+                    }
+                } catch (error) {
+                    showNotification('خطأ في جلب بيانات المنتج للتعديل: ' + error.message, 'error');
+                    console.error("Error fetching product for edit:", error);
+                    modal.close();
+                    return;
+                }
+            } else {
+                modalTitle.textContent = 'إضافة منتج جديد';
+            }
+            modal.showModal();
+        };
+
+        /**
+         * Handles the submission of the add/edit product form.
+         */
+        document.getElementById('productForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const productId = document.getElementById('productId').value;
+            const tradeName = document.getElementById('tradeName').value;
+            const barcode = document.getElementById('barcode').value;
+            const quantity = parseInt(document.getElementById('quantity').value || 0);
+            const unit = document.getElementById('unit').value || 'علبة';
+            const price = parseFloat(document.getElementById('price').value || 0);
+            const expiry = document.getElementById('expiry').value; // Date string
+            const supplier = document.getElementById('supplier').value;
+            const activeIngredient = document.getElementById('activeIngredient').value;
+            const category = document.getElementById('category').value;
+
+            if (!tradeName || quantity < 0 || price < 0) { // Quantity can be 0, but not negative
+                showNotification('الرجاء إدخال اسم المنتج، الكمية، والسعر بشكل صحيح (لا يمكن أن تكون القيم سالبة).', 'error');
+                return;
+            }
+
+            const productData = {
+                tradeName,
+                barcode: barcode || null,
+                quantity,
+                unit,
+                price,
+                expiry: expiry || null,
+                supplier: supplier || null,
+                activeIngredient: activeIngredient || null,
+                category: category || null
+            };
+
+            try {
+                if (productId) {
+                    // Update existing product
+                    await updateDoc(doc(productsCollection, productId), productData);
+                    showNotification('تم تحديث المنتج بنجاح!', 'success');
+                } else {
+                    // Add new product
+                    productData.createdAt = new Date(); // Add creation timestamp for new products
+                    await addDoc(productsCollection, productData);
+                    showNotification('تم إضافة المنتج بنجاح!', 'success');
+                }
+                document.getElementById('addProductModal').close();
+                document.getElementById('productForm').reset(); // Clear form fields
+                loadProducts(); // Reload products to update the table
+            } catch (error) {
+                showNotification('حدث خطأ أثناء حفظ المنتج: ' + error.message, 'error');
+                console.error("Error saving product:", error);
+            }
+        });
+
+        /**
+         * Deletes a product from Firestore.
+         * @param {string} productId The ID of the product document to delete.
+         */
+        window.deleteProduct = async function (productId) {
+            if (confirm('هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.')) {
+                try {
+                    await deleteDoc(doc(productsCollection, productId));
+                    showNotification('تم حذف المنتج بنجاح!', 'success');
+                    loadProducts(); // Reload products to update the table
+                } catch (error) {
+                    showNotification('حدث خطأ أثناء الحذف: ' + error.message, 'error');
+                    console.error("Error deleting product:", error);
+                }
+            }
+        };
+
+        // Make editProduct globally accessible
+        window.editProduct = window.openAddProductModal;
+
+        /**
+         * Mock function for importing products.
+         */
+        window.importProducts = function() {
+            showNotification('وظيفة استيراد المنتجات قيد التطوير. يرجى رفع ملف Excel/CSV.', 'info');
+            // Implement file input and parsing logic (e.g., using SheetJS)
+            // Then batch write to Firestore
+        };
+
+        /**
+         * Mock function for printing barcodes.
+         */
+        window.printBarcodes = function() {
+            showNotification('وظيفة طباعة الباركود قيد التطوير. سيتم عرض خيارات الطباعة قريباً.', 'info');
+            // Implement barcode generation (e.g., using JsBarcode)
+            // Then print functionality
+        };
+
+        // Initial load of products and suppliers when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            loadSuppliersForFilter();
+            document.getElementById('mainBody').classList.toggle('dark-mode', isDarkMode); // Apply dark mode on load
+            const darkModeIcon = document.getElementById('darkModeIcon');
+            if (darkModeIcon) {
+                if (isDarkMode) {
+                    darkModeIcon.innerHTML = `<path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707-.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>`;
+                } else {
+                    darkModeIcon.innerHTML = `<path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>`;
+                }
+            }
+        });
+    </script>
 </body>
 </html>
